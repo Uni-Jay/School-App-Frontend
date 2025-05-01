@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const RegisterForm: React.FC = () => {
+  const navigate = useNavigate(); // 👈 useNavigate hook
+
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -11,13 +14,13 @@ const RegisterForm: React.FC = () => {
     gender: "",
     address: "",
     password: "",
-    avatar: null as File | null,
+    image: null as File | null,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (name === "avatar" && files) {
-      setFormData({ ...formData, avatar: files[0] });
+      setFormData({ ...formData, image: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -25,48 +28,52 @@ const RegisterForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/register`;
+    const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/register`;
 
-    const payload: any = {
-      ...formData,
-      role: "super_admin",
-    };
+    const formPayload = new FormData();
+    formPayload.append("full_name", formData.full_name);
+    formPayload.append("email", formData.email);
+    formPayload.append("phone_number", formData.phone_number);
+    formPayload.append("dob", formData.dob);
+    formPayload.append("religion", formData.religion);
+    formPayload.append("gender", formData.gender);
+    formPayload.append("address", formData.address);
+    formPayload.append("password", formData.password);
+    formPayload.append("role", "super_admin");
 
-    if (formData.avatar) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        payload.avatar = reader.result;
-        try {
-          const res = await axios.post(apiUrl, payload);
-          alert(res.data.message);
-        } catch (error: any) {
-          alert(error.response?.data?.error || "Registration failed.");
-        }
-      };
-      reader.readAsDataURL(formData.avatar);
-    } else {
-      try {
-        const res = await axios.post(apiUrl, payload);
-        alert(res.data.message);
-      } catch (error: any) {
-        alert(error.response?.data?.error || "Registration failed.");
-      }
+    if (formData.image) {
+      formPayload.append("image", formData.image);
+    }
+
+    try {
+      const res = await axios.post(apiUrl, formPayload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert(res.data.message);
+
+      // 👉 Navigate to login on success
+      navigate("/login");
+    } catch (error: any) {
+      alert(error.response?.data?.error || "Registration failed.");
     }
   };
 
   return (
     <div className="py-16 px-4 bg-gray-100 min-h-screen flex items-center justify-center flex-col">
-        <div className="flex flex-col items-center mb-8">
-            <h1 className="text-4xl font-bold text-center mb-4">Welcome to the Registration Page</h1>
-            <p className="text-lg text-gray-600">Please fill in the details below to register.</p>
-        </div>
+      <div className="flex flex-col items-center mb-8">
+        <h1 className="text-4xl font-bold text-center mb-4">Welcome to the Registration Page</h1>
+        <p className="text-lg text-gray-600">Please fill in the details below to register.</p>
+      </div>
+
       <div className="flex rounded-xl overflow-hidden shadow-lg max-w-5xl w-full">
         {/* Left Side */}
         <div className="w-1/2 bg-black flex items-center justify-center p-6">
           <img
-            src="https://cdn.pixabay.com/photo/2015/09/05/21/51/book-925589_960_720.jpg"
-            alt="Book"
-            className="rounded-lg shadow-md max-h-96"
+            src="/images/school.jpg"
+            alt="School"
+            className="rounded-lg shadow-md w-full h-auto object-cover"
           />
         </div>
 
@@ -76,7 +83,7 @@ const RegisterForm: React.FC = () => {
             <h2 className="text-2xl font-bold text-center mb-4">Register Super Admin</h2>
 
             <form onSubmit={handleSubmit}>
-              {[
+              {[ 
                 { name: "full_name", type: "text", label: "Full Name" },
                 { name: "email", type: "email", label: "Email" },
                 { name: "phone_number", type: "text", label: "Phone Number" },
@@ -116,7 +123,7 @@ const RegisterForm: React.FC = () => {
                 <label className="block mb-1">Avatar</label>
                 <input
                   type="file"
-                  name="avatar"
+                  name="image"
                   accept="image/*"
                   onChange={handleChange}
                   className="w-full text-black"
