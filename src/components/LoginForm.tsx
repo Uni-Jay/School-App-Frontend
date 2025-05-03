@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm: React.FC = () => {
+    const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,7 +21,8 @@ const LoginForm: React.FC = () => {
       const res = await axios.post(apiUrl, formData);
       const { access_token } = res.data;
 
-      const payload = JSON.parse(atob(access_token.split('.')[1]));
+      const payloadBase64 = access_token.split(".")[1];
+      const payload = JSON.parse(atob(payloadBase64));
       const identity = JSON.parse(payload.sub);
 
       localStorage.setItem("token", access_token);
@@ -29,7 +32,26 @@ const LoginForm: React.FC = () => {
 
       alert("Login successful!");
       // Optionally navigate to dashboard
-        // navigate("/dashboard"); // Uncomment if you have a dashboard route
+      switch (identity.role) {
+        case "super_admin":
+          navigate("/super_admin/dashboard");
+          break;
+        case "student":
+          navigate("/student/dashboard");
+          break;
+        case "teacher":
+          navigate("/teacher/dashboard");
+          break;
+        case "school_admin":
+          navigate("/school_admin/dashboard");
+          break;
+        case "parent":
+          navigate("/parent/dashboard");
+          break;
+        default:
+          alert("Invalid role. Redirecting to login.");
+          navigate("/login");
+      }
     } catch (err: any) {
       alert(err.response?.data?.error || "Login failed");
     }
@@ -57,6 +79,7 @@ const LoginForm: React.FC = () => {
               name="password"
               onChange={handleChange}
               required
+              autoComplete="current-password"
               className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-orange-500"
             />
           </div>
