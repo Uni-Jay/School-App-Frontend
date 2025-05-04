@@ -1,19 +1,21 @@
-import React from "react";
-import Sidebar from "./Sidebar";
+
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 
-const DashboardLayout: React.FC = () => {
+
+const SuperAdminLayout = () => {
   return (
-    <div className="flex min-h-screen">
-      <Navbar />
-      {/* Sidebar component for navigation */}
+    <div className=" flex h-screen bg-gray-200 w-full overflow-hidden">
       <Sidebar />
-      <main className="flex-1 bg-gray-100 p-4">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col w-full overflow-hidden">
+        <Navbar />
+        <main className="p-4 bg-gray-100 flex-1 overflow-y-auto ">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };
 
-export default DashboardLayout;
+export default SuperAdminLayout;

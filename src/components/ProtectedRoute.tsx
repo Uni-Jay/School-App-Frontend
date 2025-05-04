@@ -1,19 +1,23 @@
-import React from "react";
+// src/components/ProtectedRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
+// import { useAuth } from "./Context/AuthContext";
 
-const ProtectedRoute: React.FC<{ allowedRole: string }> = ({ allowedRole }) => {
-  const token = localStorage.getItem("access_token");
+
+interface ProtectedRouteProps {
+
+  allowedRole: string;
+  children?: React.ReactNode; // Add this line
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRole, children }) => {
+//   const { user } = useAuth();
   const role = localStorage.getItem("role_name");
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
+  if (!role || role !== allowedRole) {
+    return <Navigate to="/login" />;
   }
 
-  if (role !== allowedRole) {
-    return <Navigate to={`/${role}/dashboard`} replace />;
-  }
-
-  return <Outlet />;
+  return <>{children ? children : <Outlet />}</>;
 };
 
 export default ProtectedRoute;

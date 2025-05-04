@@ -34,7 +34,7 @@ const LoginForm: React.FC = () => {
       // Optionally navigate to dashboard
       switch (identity.role) {
         case "super_admin":
-          navigate("/super_admin/dashboard");
+          navigate("/super_admin");
           break;
         case "student":
           navigate("/student/dashboard");
@@ -69,6 +69,7 @@ const LoginForm: React.FC = () => {
               name="email"
               onChange={handleChange}
               required
+              autoComplete="username"
               className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-orange-500"
             />
           </div>

@@ -31,15 +31,14 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/super_admin/dashboard" },
+  { label: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/super_admin" },
   { label: "Schools", icon: <Users size={20} />, path: "/super_admin/schools" },
   { label: "Parents", icon: <Users size={20} />, path: "/super_admin/parents" },
-  { label: "Teachers", icon: <UserPlus size={20} />, path: "/super_admin/parents", },
+  { label: "Teachers", icon: <UserPlus size={20} />, path: "/super_admin/teachers", },
   { label: "Students", icon: <GraduationCap size={20} />, path: "/super_admin/students" },
   { label: "Staff", icon: <Users size={20} />, path: "/super_admin/staff" },
   { label: "Admins", icon: <ShieldCheck size={20} />, path: "/super_admin/admins" },
-  { label: "Roles", icon: <ShieldCheck size={20} />, path: "/super_admin/roles" },
-  { label: "Subjects", icon: <BookOpen size={20} />, path: "/super_admin/subjects" },
+  { label: "Subjects", icon: <BookOpen size={20} />, path: "/super_admin/courses" },
   {
     label: "Classes",
     icon: <ClipboardList size={20} />,
@@ -95,67 +94,69 @@ const Sidebar: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
-  const toggleSidebar = () => setCollapsed(!collapsed);
+  const toggleSidebar = () => setCollapsed((prev) => !prev);
   const toggleSubmenu = (label: string) => {
-    setExpandedItem(expandedItem === label ? null : label);
+    setExpandedItem((prev) => (prev === label ? null : label));
   };
 
   return (
-    <div className={`bg-gray-800 text-white h-screen p-3 transition-all duration-300 ${collapsed ? "w-20" : "w-64"}`}>
-        <div className="flex items-center justify-between mb-6">
-            {!collapsed && <h1 className="text-lg font-bold">Super Admin</h1>}
-            <button onClick={toggleSidebar} className="text-white">
-            {collapsed ? <ChevronRight /> : <ChevronLeft />}
-            </button>
-        </div>
-        <ul>
-            {navItems.map((item) => (
-            <li key={item.label} className="mb-2">
-                {item.path ? (
-                <NavLink
-                    to={item.path}
-                    className={({ isActive }) =>
-                    `flex items-center gap-3 p-2 rounded hover:bg-gray-700 ${
-                        isActive ? "bg-gray-700 font-semibold" : ""
-                    }`
-                    }
-                >
-                    {item.icon}
-                    {!collapsed && <span>{item.label}</span>}
-                </NavLink>
-                ) : (
-                <div
-                    onClick={() => item.children && toggleSubmenu(item.label)}
-                    className="flex items-center gap-3 p-2 rounded hover:bg-gray-700 cursor-pointer"
-                >
-                    {item.icon}
-                    {!collapsed && <span>{item.label}</span>}
-                </div>
-                )}
-                {!collapsed && item.children && expandedItem === item.label && (
-                <ul className="ml-6 mt-1">
-                    {item.children.map((child) => (
-                    <li key={child.label} className="mb-1">
-                        <NavLink
-                        to={child.path || "#"}
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 p-2 rounded hover:bg-gray-700 ${
-                            isActive ? "bg-gray-700 font-semibold" : ""
-                            }`
-                        }
-                        >
-                        {child.icon}
-                        <span>{child.label}</span>
-                        </NavLink>
-                    </li>
-                    ))}
-                </ul>
-                )}
-            </li>
-            ))}
-        </ul>
-    </div>
+    <div className={`bg-gray-800 text-white h-full p-3 transition-all duration-300 ${collapsed ? "w-20" : "w-64"} overflow-y-auto`}>
+      <div className="flex items-center justify-between mb-6">
+        {!collapsed && <h1 className="text-lg font-bold">Super Admin</h1>}
+        <button onClick={toggleSidebar} className="text-white">
+          {collapsed ? <ChevronRight /> : <ChevronLeft />}
+        </button>
+      </div>
 
+      <ul>
+        {navItems.map((item) => (
+          <li key={item.label} className="mb-2">
+            {item.path ? (
+              <NavLink
+                to={item.path}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-2 rounded hover:bg-gray-700 ${
+                    isActive ? "bg-gray-700 font-semibold" : ""
+                  }`
+                }
+              >
+                {item.icon}
+                {!collapsed && <span>{item.label}</span>}
+              </NavLink>
+            ) : (
+              <div
+                onClick={() => item.children && toggleSubmenu(item.label)}
+                className="flex items-center gap-3 p-2 rounded hover:bg-gray-700 cursor-pointer"
+              >
+                {item.icon}
+                {!collapsed && <span>{item.label}</span>}
+              </div>
+            )}
+
+            {/* Children submenu (only visible if sidebar is expanded and item is expanded) */}
+            {!collapsed && item.children && expandedItem === item.label && (
+              <ul className="ml-6 mt-1">
+                {item.children.map((child) => (
+                  <li key={child.label} className="mb-1">
+                    <NavLink
+                      to={child.path || "#"}
+                      className={({ isActive }) =>
+                        `flex items-center gap-2 p-2 rounded hover:bg-gray-700 ${
+                          isActive ? "bg-gray-700 font-semibold" : ""
+                        }`
+                      }
+                    >
+                      {child.icon}
+                      <span>{child.label}</span>
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
